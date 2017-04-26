@@ -1,0 +1,26 @@
+{
+  "name": "multihack-core",
+  "version": "1.0.1",
+  "description": "Core module for all Multihack versions.",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "browserify src/index.js -s MultihackCore -o dist/bundle.js"
+  },
+  "author": "Thomas Mullen",
+  "license": "MIT",
+  "devDependencies": {
+    "standard": "^8.6.0",
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "y-array": "^10.0.6",
+    "y-map": "^10.0.5",
+    "y-memory": "^8.0.8",
+    "y-multihack": "^0.1.0",
+    "y-text": "^9.4.0",
+    "yjs": "^12.1.7"
+  }
+}
