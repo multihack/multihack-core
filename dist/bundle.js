@@ -22825,7 +22825,7 @@ Connector.prototype._setupP2P = function (room, nickname) {
   
   self._client.on('request', function (request) {
     if (request.metadata.voice) return
-    request.accept({wrtc:wrtc}, {
+    request.accept({wrtc:self.wrtc}, {
       nickname: self.nickname
     })
   })
