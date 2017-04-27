@@ -28001,6 +28001,8 @@ function RemoteManager (opts) {
         })
       }
     })
+    
+    self.emit('ready')
   })
 }
 
