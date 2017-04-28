@@ -27898,11 +27898,11 @@ class YConfig {
 /* globals window */
 
 var Y = require('yjs')
-var YText = require('y-text')(Y)
 require('y-memory')(Y)
 require('y-array')(Y)
 require('y-map')(Y)
 require('y-multihack')(Y)
+var YText = require('y-text')(Y)
 
 var EventEmitter = require('events').EventEmitter
 var inherits = require('inherits')
@@ -27949,9 +27949,8 @@ function RemoteManager (opts) {
           }
         } else if (event === 'peers') {
           self.peers = value
-        } else {
-          self.emit(event, value)
         }
+        self.emit(event, value)
       }
     },
     share: {

@@ -52,9 +52,8 @@ function RemoteManager (opts) {
           }
         } else if (event === 'peers') {
           self.peers = value
-        } else {
-          self.emit(event, value)
         }
+        self.emit(event, value)
       }
     },
     share: {
