@@ -111,7 +111,8 @@ function RemoteManager (opts) {
 RemoteManager.prototype.createFile = function (filePath, contents) {
   var self = this
   
-  self.yfs.set(filePath, Y.Text(contents))
+  self.yfs.set(filePath, Y.Text)
+  insertChunked(self.yfs.get(filePath), 0, contents || '')
 }
 
 RemoteManager.prototype.createDir = function (filePath, contents) {
