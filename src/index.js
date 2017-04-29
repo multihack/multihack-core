@@ -126,6 +126,11 @@ function RemoteManager (opts) {
   })
 }
 
+RemoteManager.prototype.getContent = function (filePath) {
+  var self = this
+  return self.yfs.get(filePath).toString()
+}
+
 RemoteManager.prototype.createFile = function (filePath, contents) {
   var self = this
   
