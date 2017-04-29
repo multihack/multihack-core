@@ -33,6 +33,20 @@ function RemoteManager (opts) {
   self.peers = []
   self.lastSelection = null
   
+  var tokens = {}
+  self.mutualExcluse = function (key, f) {
+    if (!tokens[key]) {
+      tokens[key] = true
+      try {
+        f()
+      } catch (e) {
+        delete tokens[key]
+        throw new Error(e)
+      }
+      delete tokens[key]
+    }
+  }
+  
   Y({
     db: {
       name: 'memory' // Store the CRDT model in memory
@@ -93,6 +107,10 @@ function RemoteManager (opts) {
         }
       } else if (event.type === 'update') { 
         // a file with the same name has been added
+        self.emit('deleteFile', {
+          filePath: filePath
+        })
+        event.value.observe(self._onYTextAdd.bind(self, filePath))
         self.emit('createFile', {
           filePath: filePath,
           content: event.value.toString()
@@ -156,25 +174,27 @@ RemoteManager.prototype.deleteFile = function (filePath) {
 RemoteManager.prototype.changeFile = function (filePath, delta) {
   var self = this
   
-  var ytext = self.yfs.get(filePath)
-  if (!ytext) return
-  
-  // apply the delta to the ytext instance
-  var start = delta.start
+  self.mutualExcluse(filePath, function () {
+    var ytext = self.yfs.get(filePath)
+    if (!ytext) return
 
-  // apply the delete operation first
-  if (delta.removed.length > 0) {
-    var delLength = 0
-    for (var j = 0; j < delta.removed.length; j++) {
-      delLength += delta.removed[j].length
+    // apply the delta to the ytext instance
+    var start = delta.start
+
+    // apply the delete operation first
+    if (delta.removed.length > 0) {
+      var delLength = 0
+      for (var j = 0; j < delta.removed.length; j++) {
+        delLength += delta.removed[j].length
+      }
+      // "enter" is also a character in our case
+      delLength += delta.removed.length - 1
+      ytext.delete(start, delLength)
     }
-    // "enter" is also a character in our case
-    delLength += delta.removed.length - 1
-    ytext.delete(start, delLength)
-  }
 
-  // apply insert operation
-  insertChunked(ytext, start, delta.text.join('\n'))
+    // apply insert operation
+    insertChunked(ytext, start, delta.text.join('\n'))
+  })
 }
 
 RemoteManager.prototype.changeSelection = function (data) {
@@ -198,28 +218,32 @@ RemoteManager.prototype.changeSelection = function (data) {
 RemoteManager.prototype._onYTextAdd = function (filePath, event) {
   var self = this
   
-  self.posFromIndex(filePath, event.index, function (from) {
-    if (event.type === 'insert') {
-      self.emit('changeFile', {
-        filePath, filePath,
-        change: {
-          from: from,
-          to: from,
-          text: event.values.join('')
-        }
-      })
-    } else if (event.type === 'delete') {
-      self.posFromIndex(filePath, event.index + event.length, function (to) {
+  self.mutualExcluse(filePath, function () { 
+    self.posFromIndex(filePath, event.index, function (from) {
+      if (event.type === 'insert') {
+        console.log('got insert')
         self.emit('changeFile', {
           filePath, filePath,
           change: {
             from: from,
-            to: to,
-            text: ''
+            to: from,
+            text: event.values.join('')
           }
         })
-      })
-    }
+      } else if (event.type === 'delete') {
+        console.log('got delete')
+        self.posFromIndex(filePath, event.index + event.length, function (to) {
+          self.emit('changeFile', {
+            filePath, filePath,
+            change: {
+              from: from,
+              to: to,
+              text: ''
+            }
+          })
+        })
+      }
+    })
   })
 }
 
