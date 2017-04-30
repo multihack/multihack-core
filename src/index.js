@@ -164,7 +164,7 @@ function chunkString(str, size) {
   return chunks;
 }
 
-RemoteManager.prototype.renameFile = function (oldPath, newPath) {
+RemoteManager.prototype.replaceFile = function (oldPath, newPath) {
   var self = this
   
   self.yfs.set(newPath, self.yfs.get(oldPath))
