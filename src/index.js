@@ -110,11 +110,17 @@ function RemoteManager (opts) {
         self.emit('deleteFile', {
           filePath: filePath
         })
-        event.value.observe(self._onYTextAdd.bind(self, filePath))
-        self.emit('createFile', {
-          filePath: filePath,
-          content: event.value.toString()
-        })
+        if (event.value instanceof Y.Text.typeDefinition.class) {
+          event.value.observe(self._onYTextAdd.bind(self, filePath))
+          self.emit('createFile', {
+            filePath: filePath,
+            content: event.value.toString()
+          })
+        } else {
+          self.emit('createDIR', {
+            filePath: filePath
+          })
+        }
       } else if (event.type === 'delete') { // delete
         self.emit('deleteFile', {
           filePath: filePath
