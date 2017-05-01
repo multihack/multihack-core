@@ -28,6 +28,7 @@ function RemoteManager (opts) {
   self.posFromIndex = function (filePath, index, cb) {
     console.warn('No "remote.posFromIndex" provided. Unable to apply change!')
   }
+  self.client = null
   self.voice = null
   self.peers = []
   self.lastSelection = null
@@ -59,10 +60,11 @@ function RemoteManager (opts) {
       events: function (event, value) {
         if (event === 'id') {
           self.id = value
-        }else if (event === 'voice') {
+        } else if (event === 'client') {
+          self.client = value
+        } else if (event === 'voice') {
           if (Voice) {
             self.voice = new Voice(value.socket, value.client, self.roomID)
-            self.client = value.client
           }
         } else if (event === 'peers') {
           self.peers = value
@@ -261,7 +263,7 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
 RemoteManager.prototype.destroy = function () {
   var self = this
   
-  self.client.destroy()
+  if (self.client) self.client.destroy()
   self.client = null
   self.voice = null
   self.id = null
