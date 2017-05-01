@@ -24,7 +24,6 @@ function RemoteManager (opts) {
   self.nickname = opts.nickname || 'Guest'
   self.id = null
   self.yfs = null
-  self.ytext = null
   self.ySelections = null
   self.posFromIndex = function (filePath, index, cb) {
     console.warn('No "remote.posFromIndex" provided. Unable to apply change!')
@@ -63,6 +62,7 @@ function RemoteManager (opts) {
         }else if (event === 'voice') {
           if (Voice) {
             self.voice = new Voice(value.socket, value.client, self.roomID)
+            self.client = value.client
           }
         } else if (event === 'peers') {
           self.peers = value
@@ -117,7 +117,7 @@ function RemoteManager (opts) {
             content: event.value.toString()
           })
         } else {
-          self.emit('createDIR', {
+          self.emit('createDir', {
             filePath: filePath
           })
         }
@@ -261,6 +261,15 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
 RemoteManager.prototype.destroy = function () {
   var self = this
   
+  self.client.destroy()
+  self.client = null
+  self.voice = null
+  self.id = null
+  self.yfs = null
+  self.ySelections = null
+  self.posFromIndex = null
+  self.peers = []
+  self.lastSelection = null
 }
 
 module.exports = RemoteManager

@@ -27937,7 +27937,6 @@ function RemoteManager (opts) {
   self.nickname = opts.nickname || 'Guest'
   self.id = null
   self.yfs = null
-  self.ytext = null
   self.ySelections = null
   self.posFromIndex = function (filePath, index, cb) {
     console.warn('No "remote.posFromIndex" provided. Unable to apply change!')
@@ -27976,6 +27975,7 @@ function RemoteManager (opts) {
         }else if (event === 'voice') {
           if (Voice) {
             self.voice = new Voice(value.socket, value.client, self.roomID)
+            self.client = value.client
           }
         } else if (event === 'peers') {
           self.peers = value
@@ -28023,11 +28023,17 @@ function RemoteManager (opts) {
         self.emit('deleteFile', {
           filePath: filePath
         })
-        event.value.observe(self._onYTextAdd.bind(self, filePath))
-        self.emit('createFile', {
-          filePath: filePath,
-          content: event.value.toString()
-        })
+        if (event.value instanceof Y.Text.typeDefinition.class) {
+          event.value.observe(self._onYTextAdd.bind(self, filePath))
+          self.emit('createFile', {
+            filePath: filePath,
+            content: event.value.toString()
+          })
+        } else {
+          self.emit('createDir', {
+            filePath: filePath
+          })
+        }
       } else if (event.type === 'delete') { // delete
         self.emit('deleteFile', {
           filePath: filePath
@@ -28077,7 +28083,7 @@ function chunkString(str, size) {
   return chunks;
 }
 
-RemoteManager.prototype.renameFile = function (oldPath, newPath) {
+RemoteManager.prototype.replaceFile = function (oldPath, newPath) {
   var self = this
   
   self.yfs.set(newPath, self.yfs.get(oldPath))
@@ -28168,6 +28174,15 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
 RemoteManager.prototype.destroy = function () {
   var self = this
   
+  self.client.destroy()
+  self.client = null
+  self.voice = null
+  self.id = null
+  self.yfs = null
+  self.ySelections = null
+  self.posFromIndex = null
+  self.peers = []
+  self.lastSelection = null
 }
 
 module.exports = RemoteManager
