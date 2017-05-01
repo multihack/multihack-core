@@ -263,14 +263,17 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
 RemoteManager.prototype.destroy = function () {
   var self = this
   
-  if (self.client) self.client.destroy()
+  // TODO: Add a proper destroy function in simple-signal
+  peers.forEach(function (peer) {
+    peer.destroy()
+  })
+  
   self.client = null
   self.voice = null
   self.id = null
   self.yfs = null
   self.ySelections = null
   self.posFromIndex = null
-  self.peers = []
   self.lastSelection = null
 }
 
