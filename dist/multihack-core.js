@@ -22991,7 +22991,10 @@ Connector.prototype.disconnect = function () {
   self._client = null
   self.nop2p = null
   self.peers = []
-  self.events('peers', self.peers)
+  self.events('peers', {
+    peers: self.peers,
+    mustForward: self.mustForward
+  })
   self._handlers = null
   self._socket.disconnect()
   self._socket = null
@@ -23002,7 +23005,10 @@ Connector.prototype.reconnect = function () {
   
   self._socket = new Io(self.hostname)
   self.peers = []
-  self.events('peers', self.peers)
+  self.events('peers', {
+    peers: self.peers,
+    mustForward: self.mustForward
+  })
   self.mustForward = 0 // num of peers that are nop2p
 
   self._setupSocket()
