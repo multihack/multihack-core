@@ -58,7 +58,7 @@ function RemoteManager (opts) {
       nickname: self.nickname,
       wrtc: opts.wrtc,
       events: function (event, value) {
-        if (event === 'ready') {
+        if (event === 'id') {
           self.id = value.id
           self.nop2p = value.nop2p
         } else if (event === 'client') {
