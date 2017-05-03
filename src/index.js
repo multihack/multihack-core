@@ -239,7 +239,6 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
   self.mutualExcluse(filePath, function () { 
     self.posFromIndex(filePath, event.index, function (from) {
       if (event.type === 'insert') {
-        console.log('got insert')
         self.emit('changeFile', {
           filePath, filePath,
           change: {
@@ -249,7 +248,6 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
           }
         })
       } else if (event.type === 'delete') {
-        console.log('got delete')
         self.posFromIndex(filePath, event.index + event.length, function (to) {
           self.emit('changeFile', {
             filePath, filePath,
