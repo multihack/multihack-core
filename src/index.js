@@ -58,8 +58,9 @@ function RemoteManager (opts) {
       nickname: self.nickname,
       wrtc: opts.wrtc,
       events: function (event, value) {
-        if (event === 'id') {
-          self.id = value
+        if (event === 'ready') {
+          self.id = value.id
+          self.nop2p = value.nop2p
         } else if (event === 'client') {
           self.client = value
         } else if (event === 'voice') {
@@ -67,7 +68,8 @@ function RemoteManager (opts) {
             self.voice = new Voice(value.socket, value.client, self.roomID)
           }
         } else if (event === 'peers') {
-          self.peers = value
+          self.peers = value.peers
+          self.mustForward = value.mustForward
         }
         self.emit(event, value)
       }
