@@ -22977,7 +22977,8 @@ Connector.prototype.disconnect = function () {
   self.voice = null
   self._client = null
   self.nop2p = null
-  self.peers = null
+  self.peers = []
+  self.events('peers', self.peers)
   self._handlers = null
   self._socket.disconnect()
   self._socket = null
@@ -22988,6 +22989,7 @@ Connector.prototype.reconnect = function () {
   
   self._socket = new Io(self.hostname)
   self.peers = []
+  self.events('peers', self.peers)
   self.mustForward = 0 // num of peers that are nop2p
 
   self._setupSocket()
@@ -27991,6 +27993,7 @@ function RemoteManager (opts) {
       dir_tree: 'Map'
     }
   }).then(function (y) {
+    self.y = y
     self.yfs = y.share.dir_tree
     self.ySelections = y.share.selections
     
@@ -27998,7 +28001,7 @@ function RemoteManager (opts) {
       if (event.type === 'insert') {
         event.values.forEach(function (sel) {
           if (sel.id !== self.id || !self.id) {
-            self.emit('changeSelection', sel)
+            self.emit('changeSelection', self.ySelections.toArray())
           }
         })
       }
@@ -28178,10 +28181,10 @@ RemoteManager.prototype.destroy = function () {
   var self = this
   
   // TODO: Add a proper destroy function in simple-signal
-  peers.forEach(function (peer) {
+  self.peers.forEach(function (peer) {
     peer.destroy()
   })
-  
+  self.peers = []
   self.client = null
   self.voice = null
   self.id = null
