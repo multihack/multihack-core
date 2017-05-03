@@ -87,7 +87,9 @@ function RemoteManager (opts) {
       if (event.type === 'insert') {
         event.values.forEach(function (sel) {
           if (sel.id !== self.id || !self.id) {
-            self.emit('changeSelection', self.ySelections.toArray())
+            self.emit('changeSelection', self.ySelections.toArray().filter(function (sel) {
+              return sel.id !== self.id
+            }))
           }
         })
       }
