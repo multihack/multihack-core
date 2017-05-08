@@ -22792,7 +22792,7 @@ Connector.prototype._setupSocket = function () {
   self._socket.on('id', function (id) {
     if (self.id) return
     self.id = id
-    self.events('ready', {
+    self.events('id', {
       id: self.id,
       nop2p: self.nop2p
     })
@@ -22824,7 +22824,7 @@ Connector.prototype._setupP2P = function (room, nickname) {
     if (!self.id) {
       self.setUserId(self._client.id)
       self.id = self._client.id
-      self.events('ready', {
+      self.events('id', {
         id: self.id,
         nop2p: self.nop2p
       })
@@ -27994,7 +27994,7 @@ function RemoteManager (opts) {
       nickname: self.nickname,
       wrtc: opts.wrtc,
       events: function (event, value) {
-        if (event === 'ready') {
+        if (event === 'id') {
           self.id = value.id
           self.nop2p = value.nop2p
         } else if (event === 'client') {
@@ -28006,6 +28006,8 @@ function RemoteManager (opts) {
         } else if (event === 'peers') {
           self.peers = value.peers
           self.mustForward = value.mustForward
+        } else if (event === 'lostPeer') {
+          self._onLostPeer(value)
         }
         self.emit(event, value)
       }
@@ -28020,15 +28022,13 @@ function RemoteManager (opts) {
     self.ySelections = y.share.selections
     
     self.ySelections.observe(function (event) {
-      if (event.type === 'insert') {
-        event.values.forEach(function (sel) {
-          if (sel.id !== self.id || !self.id) {
-            self.emit('changeSelection', self.ySelections.toArray().filter(function (sel) {
-              return sel.id !== self.id
-            }))
-          }
-        })
-      }
+      event.values.forEach(function (sel) {
+        if (sel.id !== self.id || !self.id) {
+          self.emit('changeSelection', self.ySelections.toArray().filter(function (sel) {
+            return sel.id !== self.id
+          }))
+        }
+      })
     })
     
     self.yfs.observe(function (event) {
@@ -28196,6 +28196,16 @@ RemoteManager.prototype._onYTextAdd = function (filePath, event) {
         })
       }
     })
+  })
+}
+
+RemoteManager.prototype._onLostPeer = function (peer) {
+  var self = this
+  
+  self.ySelections.toArray().forEach(function (sel, i) {
+    if (sel.id === peer.id) {
+      self.ySelections.delete(i)
+    }
   })
 }
 
