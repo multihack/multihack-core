@@ -1,6 +1,6 @@
 {
   "name": "multihack-core",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Core module for all Multihack versions.",
   "main": "src/index.js",
   "directories": {
