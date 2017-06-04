@@ -1,5 +1,7 @@
 /* globals window */
 
+require('babel-polyfill')
+
 var Y = require('yjs')
 require('y-memory')(Y)
 require('y-array')(Y)
@@ -194,7 +196,7 @@ RemoteManager.prototype.changeFile = function (filePath, delta) {
   
   self.mutualExcluse(filePath, function () {
     var ytext = self.yfs.get(filePath)
-    if (!ytext) return
+    if (!ytext) self.createFile(filePath, '')
 
     // apply the delta to the ytext instance
     var start = delta.start
@@ -276,14 +278,11 @@ RemoteManager.prototype._onLostPeer = function (peer) {
 RemoteManager.prototype.destroy = function () {
   var self = this
   
-  // TODO: Add a proper destroy function in simple-signal
-  self.peers.forEach(function (peer) {
-    peer.destroy()
-  })
-  self.peers = []
+  self.y.connector.disconnect()
   self.client = null
   self.voice = null
   self.id = null
+  self.y = null
   self.yfs = null
   self.ySelections = null
   self.posFromIndex = null
