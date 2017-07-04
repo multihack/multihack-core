@@ -110,7 +110,7 @@ function RemoteManager (opts) {
     self.yfs.observe(function (event) {
       var filePath = event.name
 
-      if (event.type === 'add') { // create file/folder     
+      if (event.type === 'add' || event.type === 'update') { // create file/folder     
 
         if (event.value instanceof Y.Text.typeDefinition.class) {
           event.value.observe(self._onYTextAdd.bind(self, filePath))
@@ -122,22 +122,6 @@ function RemoteManager (opts) {
         } else {
           self.emit('createDir', {
             path: filePath
-          })
-        }
-      } else if (event.type === 'update') { 
-        // a file with the same name has been added
-        self.emit('deleteFile', {
-          filePath: filePath
-        })
-        if (event.value instanceof Y.Text.typeDefinition.class) {
-          event.value.observe(self._onYTextAdd.bind(self, filePath))
-          self.emit('createFile', {
-            filePath: filePath,
-            content: event.value.toString()
-          })
-        } else {
-          self.emit('createDir', {
-            filePath: filePath
           })
         }
       } else if (event.type === 'delete') { // delete
