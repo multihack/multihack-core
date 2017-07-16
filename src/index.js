@@ -3,6 +3,7 @@
 require('babel-polyfill')
 
 var Y = require('yjs')
+require('y-memory')(Y)
 require('y-indexeddb')(Y)
 require('y-array')(Y)
 require('y-map')(Y)
