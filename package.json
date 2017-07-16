@@ -17,9 +17,10 @@
   },
   "dependencies": {
     "y-array": "^10.0.6",
+    "y-indexeddb": "^8.1.9",
     "y-map": "^10.0.5",
     "y-memory": "^8.0.8",
-    "y-multihack": "^1.0.5",
+    "y-multihack": "^1.0.6",
     "y-text": "^9.4.0",
     "yjs": "^12.1.7"
   }

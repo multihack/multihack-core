@@ -3,7 +3,7 @@
 require('babel-polyfill')
 
 var Y = require('yjs')
-require('y-memory')(Y)
+require('y-indexeddb')(Y)
 require('y-array')(Y)
 require('y-map')(Y)
 require('y-multihack')(Y)
@@ -61,7 +61,7 @@ function RemoteManager (opts) {
   
   Y({
     db: {
-      name: 'memory' // Store the CRDT model in memory
+      name: 'indexeddb'
     },
     connector: {
       name: 'multihack', // TODO: Use a custom connector
