@@ -1,6 +1,8 @@
 /* globals window */
 
-require('babel-polyfill')
+if (!window._babelPolyfill) {
+  require('babel-polyfill')
+}
 
 var Y = require('yjs')
 require('y-memory')(Y)
